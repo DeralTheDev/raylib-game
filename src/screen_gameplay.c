@@ -30,13 +30,28 @@
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
-float delta = 0.0f;
+static float screenWidth = GetScreenWidth();
+static float screenHeight = GetScreenHeight();
+static float delta = 0.0f;
 
 static int framesCounter = 0;
 static int finishScreen = 0;
 
-Rectangle player = { 0 };
-float playerSpeed = 0.0f;
+// Player
+typedef struct
+{
+    Rectangle rec;
+    Vector2 velocity;
+    float maxSpeed;
+    bool normalized;
+} Player;
+
+static Player player = { 0 };
+
+void normalizeVector2(Vector2 *v)
+{
+    v->x /= 3.14; v->y /= 3.14;
+}
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
@@ -51,8 +66,10 @@ void InitGameplayScreen(void)
     framesCounter = 0;
     finishScreen = 0;
 
-    player = (Rectangle){GetScreenWidth()/2+25, GetScreenHeight()/2+25, 50, 50};
-    playerSpeed = 500.0f;
+    player = (Player){
+        (Rectangle){screenWidth/2+25, screenHeight/2+25, 50, 50},
+        (Vector2){0, 0}, 500, false
+    };
 }
 
 // Gameplay Screen Update logic
@@ -61,11 +78,30 @@ void UpdateGameplayScreen(void)
     // TODO: Update GAMEPLAY screen variables here!
     delta = GetFrameTime();
 
-    if (IsKeyDown(KEY_D)) player.x += playerSpeed * delta;
-    if (IsKeyDown(KEY_A)) player.x -= playerSpeed * delta;
+    // Player Update
+    player.rec.x += player.velocity * delta;
+    player.rec.y += player.velocity * delta;
 
-    if (player.x <= 0) player.x = 0;
-    else if (player.x + player.width >= GetScreenWidth()) player.x = GetScreenWidth() - player.width;
+    if (IsKeyDown(KEY_D)) player.velocity.x = player.maxSpeed;
+    else if (IsKeyDown(KEY_A)) player.velocity.x = -player.maxSpeed;
+    else player.velocity.x = 0; player.normalized = false;
+
+    if (IsKeyDown(KEY_W)) player.velocity.y = -player.maxSpeed;
+    else if (IsKeyDown(KEY_S)) player.velocity.y = player.maxSpeed;
+    else player.velocity.y = 0; player.normalized = false;
+
+    // Normalize Player velocity
+    if (!player.normalized && (player.velocity.x && player.velocity.y))
+    {
+        normalizeVector2(&player.velocity);
+        player.normalized = true;
+    }
+
+    if (player.rec.x <= 0) player.rec.x = 0;
+    else if (player.rec.x + player.rec.width >= GetScreenWidth()) player.x = GetScreenWidth() - player.width;
+
+    if (player.rec.y <= 0) player.rec.y = 0;
+    else if (player.recy)
 
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
