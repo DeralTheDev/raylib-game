@@ -65,7 +65,7 @@ jobs:
     - name: Generate Artifacts
       run: |
         dir ${{ env.PROJECT_BUILD_PATH }}
-        copy /Y ${{ env.PROJECT_BUILD_PATH }}\${{ env.PROJECT_NAME }}.exe ${{ env.PROJECT_RELEASE_PATH }}\${{ env.PROJECT_NAME }}.exe
+        for /r . %%i in (*.exe) do copy "%%i" "${{ env.PROJECT_RELEASE_PATH }}\"
         xcopy ${{ env.PROJECT_NAME }}\${{ env.PROJECT_RESOURCES_PATH }} ${{ env.PROJECT_RELEASE_PATH }}\${{ env.PROJECT_RESOURCES_PATH }} /s /e /i
         copy /Y ${{ env.PROJECT_NAME }}\README.md ${{ env.PROJECT_RELEASE_PATH }}\README.md
         copy /Y ${{ env.PROJECT_NAME }}\LICENSE ${{ env.PROJECT_RELEASE_PATH }}\LICENSE
