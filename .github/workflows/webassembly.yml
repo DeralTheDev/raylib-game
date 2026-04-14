@@ -89,3 +89,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: github.event_name == 'release' && github.event.action == 'published'
+
+    - name: Copy resources
+      run: |
+        xcopy ${{ env.PROJECT_NAME }}\resources ${{ env.PROJECT_RELEASE_PATH }}\resources /E /I /Y
+      shell: cmd
