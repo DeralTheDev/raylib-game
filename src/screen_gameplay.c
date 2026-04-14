@@ -98,7 +98,8 @@ void UpdateGameplayScreen(void)
     }
 
     if (player.rec.x <= 0) player.rec.x = 0;
-    else if (player.rec.x + player.rec.width >= GetScreenWidth()) player.x = GetScreenWidth() - player.width;
+    else if (player.rec.x + player.rec.width >= GetScreenWidth())
+        player.rec.x = GetScreenWidth() - player.rec.width;
 
     if (player.rec.y <= 0) player.rec.y = 0;
     else if (player.rec.y + player.rec.height >= screenHeight)
