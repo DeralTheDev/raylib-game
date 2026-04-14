@@ -84,11 +84,11 @@ void UpdateGameplayScreen(void)
 
     if (IsKeyDown(KEY_D)) player.velocity.x = player.maxSpeed;
     else if (IsKeyDown(KEY_A)) player.velocity.x = -player.maxSpeed;
-    else player.velocity.x = 0; player.normalized = false;
+    else { player.velocity.x = 0; player.normalized = false; }
 
     if (IsKeyDown(KEY_W)) player.velocity.y = -player.maxSpeed;
     else if (IsKeyDown(KEY_S)) player.velocity.y = player.maxSpeed;
-    else player.velocity.y = 0; player.normalized = false;
+    else { player.velocity.y = 0; player.normalized = false; }
 
     // Normalize Player velocity
     if (!player.normalized && (player.velocity.x && player.velocity.y))
