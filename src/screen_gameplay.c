@@ -101,7 +101,8 @@ void UpdateGameplayScreen(void)
     else if (player.rec.x + player.rec.width >= GetScreenWidth()) player.x = GetScreenWidth() - player.width;
 
     if (player.rec.y <= 0) player.rec.y = 0;
-    else if (player.recy)
+    else if (player.rec.y + player.rec.height >= screenHeight)
+        player.rec.y = screenHeight + player.rec.height;
 
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
@@ -120,7 +121,7 @@ void DrawGameplayScreen(void)
     DrawTextEx(font, "GAMEPLAY SCREEN", pos, font.baseSize*3.0f, 4, MAROON);
     DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
 
-    DrawRectangleRec(player, BLUE);
+    DrawRectangleRec(player.rec, BLUE);
 }
 
 // Gameplay Screen Unload logic
