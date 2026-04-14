@@ -25,12 +25,18 @@
 
 #include "raylib.h"
 #include "screens.h"
+#include <stdbool.h>
 
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
+float delta = 0.0f;
+
 static int framesCounter = 0;
 static int finishScreen = 0;
+
+Rectangle player = { 0 };
+float playerSpeed = 0.0f;
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
@@ -40,18 +46,30 @@ static int finishScreen = 0;
 void InitGameplayScreen(void)
 {
     // TODO: Initialize GAMEPLAY screen variables here!
+    delta = 0.0f;
+
     framesCounter = 0;
     finishScreen = 0;
+
+    player = (Rectangle){GetScreenWidth()/2+25, GetScreenHeight()/2+25, 50, 50};
+    playerSpeed = 500.0f;
 }
 
 // Gameplay Screen Update logic
 void UpdateGameplayScreen(void)
 {
     // TODO: Update GAMEPLAY screen variables here!
+    delta = GetFrameTime();
 
-    // Press enter or tap to change to ENDING screen
+    if (IsKeyDown(KEY_D)) player.x += playerSpeed * delta;
+    if (IsKeyDown(KEY_A)) player.x -= playerSpeed * delta;
+
+    if (player.x <= 0) player.x = 0;
+    else if (player.x + player.width >= GetScreenWidth()) player.x = GetScreenWidth() - player.width;
+
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
+        // finishScreen = 2 // Back to TITLE
         finishScreen = 1;
         PlaySound(fxCoin);
     }
@@ -65,6 +83,8 @@ void DrawGameplayScreen(void)
     Vector2 pos = { 20, 10 };
     DrawTextEx(font, "GAMEPLAY SCREEN", pos, font.baseSize*3.0f, 4, MAROON);
     DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+
+    DrawRectangleRec(player, BLUE);
 }
 
 // Gameplay Screen Unload logic
