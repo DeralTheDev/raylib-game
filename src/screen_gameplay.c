@@ -25,6 +25,7 @@
 
 #include "raylib.h"
 #include "screens.h"
+#include "player.h"
 
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
@@ -36,21 +37,9 @@ static float delta = 0.0f;
 static int framesCounter = 0;
 static int finishScreen = 0;
 
-// Player
-typedef struct
-{
-    Rectangle rec;
-    Vector2 velocity;
-    float maxSpeed;
-} Player;
-
 static Player player = { 0 };
 
-static void normalizeVector2(Vector2 *v, float speed)
-{
-    v->x = (v->x > 0) ? speed / 1.4142f : -speed / 1.4142f;
-    v->y = (v->y > 0) ? speed / 1.4142f : -speed / 1.4142f;
-}
+bool onMobileOrIpad = false;
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
@@ -67,44 +56,16 @@ void InitGameplayScreen(void)
     framesCounter = 0;
     finishScreen = 0;
 
-    player = (Player){
-        (Rectangle){screenWidth/2+25, screenHeight/2+25, 50, 50},
-        (Vector2){0, 0}, 300
-    };
+    player = initPlayer((Rectangle){100, 0, 75, 50}, (Vector2){0, 0}, 300);
+    player.rec.y = (screenHeight - player.rec.height) / 2;
 }
 
 // Gameplay Screen Update logic
 void UpdateGameplayScreen(void)
 {
-    // TODO: Update GAMEPLAY screen variables here!
     delta = GetFrameTime();
 
-    // Player Update
-    player.rec.x += player.velocity.x * delta;
-    player.rec.y += player.velocity.y * delta;
-
-    if (IsKeyDown(KEY_D)) player.velocity.x = player.maxSpeed;
-    else if (IsKeyDown(KEY_A)) player.velocity.x = -player.maxSpeed;
-    else player.velocity.x = 0;
-        
-    if (IsKeyDown(KEY_W)) player.velocity.y = -player.maxSpeed;
-    else if (IsKeyDown(KEY_S)) player.velocity.y = player.maxSpeed;
-    else player.velocity.y = 0;
-
-    // Normalize Player velocity
-    if ((IsKeyDown(KEY_D) || IsKeyDown(KEY_A)) && (IsKeyDown(KEY_S) || IsKeyDown(KEY_W)))
-    {
-        normalizeVector2(&player.velocity, player.maxSpeed);
-    }
-
-    // Screen border limit
-    if (player.rec.x <= 0) player.rec.x = 0;
-    else if (player.rec.x + player.rec.width >= screenWidth)
-        player.rec.x = screenWidth - player.rec.width;
-
-    if (player.rec.y <= 0) player.rec.y = 0;
-    else if (player.rec.y + player.rec.height >= screenHeight)
-        player.rec.y = screenHeight - player.rec.height;
+    updatePlayer(&player, delta);
 
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
@@ -112,6 +73,8 @@ void UpdateGameplayScreen(void)
         finishScreen = 1;
         PlaySound(fxCoin);
     }
+
+    if (GetTouchPointCount() > 0 && !onMobileOrIpad) onMobileOrIpad = true;
 }
 
 // Gameplay Screen Draw logic
@@ -122,13 +85,15 @@ void DrawGameplayScreen(void)
     DrawTextEx(font, "GAMEPLAY SCREEN", pos, font.baseSize*3.0f, 4, MAROON);
     DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
     // Draw Player
-    DrawRectangleRec(player.rec, BLUE);
+    drawPlayer(player);
+
+    if (onMobileOrIpad) DrawText("On Mobile/Ipad", 10, 50, 20, DARKGREEN);
 }
 
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void)
 {
-    // TODO: Unload GAMEPLAY screen variables here!
+    unloadPlayer(&player);
 }
 
 // Gameplay Screen should finish?
