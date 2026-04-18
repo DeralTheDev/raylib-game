@@ -39,7 +39,11 @@ PROJECT_SOURCE_FILES  ?= \
     screen_options.c \
     screen_gameplay.c \
     screen_ending.c \
-    player.c
+    player.c \
+    projectile.c \
+    enemy.c \
+    health_bar.c \
+    joystick.c
 
 # raylib library variables
 RAYLIB_SRC_PATH       ?= ../../raylib/src

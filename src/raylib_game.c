@@ -12,9 +12,11 @@
 *
 ********************************************************************************************/
 
+#include <stdio.h>
+#include <time.h>
+
 #include "raylib.h"
 #include "screens.h"    // NOTE: Declares global (extern) variables and screens functions
-#include <stdio.h>
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -26,8 +28,10 @@
 //----------------------------------------------------------------------------------
 GameScreen currentScreen = LOGO;
 Font font = { 0 };
+int fontSize = 0;
 Music music = { 0 };
 Sound fxCoin = { 0 };
+bool onMobileIpad = false;
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition (local to this module)
@@ -61,20 +65,24 @@ int main(void)
     // Initialization
     //---------------------------------------------------------
     ChangeDirectory(GetApplicationDirectory());
+    SetRandomSeed(time(NULL));
     InitWindow(screenWidth, screenHeight, "raylib game template");
 
     InitAudioDevice();      // Initialize audio device
 
     // Load global data (assets that must be available in all screens, i.e. font)
     font = LoadFont("resources/mecha.png");
+    fontSize = font.baseSize * 3.0f;
+
     //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
     fxCoin = LoadSound("resources/coin.wav");
+    onMobileIpad = true;
 
     SetMusicVolume(music, 1.0f);
     PlayMusicStream(music);
 
     // Setup and init first screen
-    currentScreen = LOGO;
+    currentScreen = TITLE;
     InitLogoScreen();
 
 #if defined(PLATFORM_WEB)
@@ -225,6 +233,9 @@ static void UpdateDrawFrame(void)
     // Update
     //----------------------------------------------------------------------------------
     //UpdateMusicStream(music);       // NOTE: Music keeps playing between screens
+
+    // Check if on mobile/ipad
+    if (GetTouchPointCount() > 0 && !onMobileIpad) onMobileIpad = true;
 
     if (!onTransition)
     {
