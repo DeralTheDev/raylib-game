@@ -44,12 +44,14 @@ static int finishScreen = 0;
 
 static Player player = { 0 };
 
-static const int prjArrSize = 50; // Only 50 projectiles on-screen
-static Projectile prjArr[prjArrSize] = { 0 };
+// Only 50 projectiles on-screen
+static Projectile prjArr[50] = { 0 };
+static int prjArrSize = 0;
 static int prjArrIndex = 0;
 
-static const int enemyArrSize = 10; // Only 10 enemies on-screen
-static Enemy enemyArr[enemyArrSize] = { 0 };
+// Only 10 enemies on-screen
+static Enemy enemyArr[10] = { 0 };
+static int enemyArrSize = 0;
 static int enemyArrIndex = 0;
 static int enemyCounter = 0;
 static int enemyCooldown = 0;
@@ -88,12 +90,14 @@ void InitGameplayScreen(void)
     player = initPlayer((Rectangle){150, 0, 75, 50}, (Vector2){0, 0}, 300, 10);
     player.rec.y = (screenHeight - player.rec.height) / 2;
 
+    prjArrSize = sizeof(prjArr) / sizeof(Projectile);
     for (int i = 0; i < prjArrSize; i++)
     {
         prjArr[i] = (Projectile){ 0 };
     }
     prjArrIndex = 0;
 
+    enemyArrSize = sizeof(enemyArr) / sizeof(Enemy);
     for (int i = 0; i < enemyArrSize; i++)
     {
         enemyArr[i] = (Enemy){ 0 };
