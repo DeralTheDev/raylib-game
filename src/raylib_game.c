@@ -235,11 +235,16 @@ static void UpdateDrawFrame(void)
     //UpdateMusicStream(music);       // NOTE: Music keeps playing between screens
 
     // Check if on mobile/ipad
-    if (GetTouchPointCount() > 0 && !onMobileIpad) onMobileIpad = true;
+    if (GetTouchPointCount() > 0 && !onMobileIpad)
+    {
+        onMobileIpad = true;
+        SetGesturesEnabled(GESTURE_TAP | GESTURE_HOLD | GESTURE_DRAG);
+        printf("yes\n");
+    }
 
     if (!onTransition)
     {
-        switch(currentScreen)
+        switch (currentScreen)
         {
             case LOGO:
             {
@@ -290,7 +295,7 @@ static void UpdateDrawFrame(void)
 
         ClearBackground(RAYWHITE);
 
-        switch(currentScreen)
+        switch (currentScreen)
         {
             case LOGO: DrawLogoScreen(); break;
             case TITLE: DrawTitleScreen(); break;

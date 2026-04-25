@@ -3,20 +3,22 @@
 
 JoyStick initJoyStick(Vector2 baseV, float radius)
 {
-	return (JoyStick){baseV, radius, baseV, radius * 0.5f, (Vector2){0, 0}};
+	return (JoyStick){baseV, radius, baseV, radius * 0.5f, (Vector2){0, 0}, false};
 }
 
 void updateJoyStick(JoyStick *joyStick, float delta)
 {
-	if (IsGestureDetected(GESTURE_DRAG))
+	Vector2 touchPos = GetTouchPosition(GetTouchPointCount());
+
+	if (hypot(touchPos.x - joyStick->cPos.x, touchPos.y - joyStick->cPos.y) <= joyStick->cRadius)
 	{
-		joyStick->cPos = GetTouchPosition(0);
-	}
-	else
-	{
-		joyStick->cPos = joyStick->basePos;
+		if (IsGestureDetected(GESTURE_DRAG)) joyStick->drag = true;
+		else joyStick->drag = false;
 	}
 
+	if (joyStick->drag) joyStick->cPos = touchPos;
+	else joyStick->cPos = joyStick->basePos;
+	
 	if (hypot(joyStick->cPos.x - joyStick->basePos.x, joyStick->cPos.y - joyStick->basePos.y) >= joyStick->baseRadius)
 	{
 		float ratio = joyStick->baseRadius / hypot(joyStick->cPos.x - joyStick->basePos.x, joyStick->cPos.y - joyStick->basePos.y);

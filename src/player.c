@@ -20,7 +20,7 @@ Player initPlayer(Rectangle rec, float maxSpeed, int healthNum)
 	return (Player){rec, (Vector2){0, 0}, maxSpeed, (Vector2){0, 0}, false, 0, initHealthBar(healthNum, DARKGREEN)};
 }
 
-void updatePlayer(Player *player, float delta)
+void updatePlayer(Player *player, JoyStick joyStick, float delta)
 {
 	// Update player
 	player->velocity.x = Lerp(player->velocity.x, player->cVelocity.x, lerpValue);
@@ -29,16 +29,28 @@ void updatePlayer(Player *player, float delta)
 	player->rec.x += player->velocity.x * delta;
 	player->rec.y += player->velocity.y * delta;
 
-	if (IsKeyDown(KEY_D)) player->cVelocity.x = player->maxSpeed;
-	else if (IsKeyDown(KEY_A)) player->cVelocity.x = -player->maxSpeed;
-	else player->cVelocity.x = 0;
+	// Mobile/Ipad control
+	if (joyStick.baseRadius != 0)
+	{
+		Vector2 joyStickPos = getJoyStickPos(joyStick);
 
-	if (IsKeyDown(KEY_S)) player->cVelocity.y = player->maxSpeed;
-	else if (IsKeyDown(KEY_W)) player->cVelocity.y = -player->maxSpeed;
-	else player->cVelocity.y = 0;
+        player->cVelocity.x = player->maxSpeed / joyStick.baseRadius * joyStickPos.x;
+        player->cVelocity.y = player->maxSpeed / joyStick.baseRadius * joyStickPos.y;
+	}
+	// Desktop control
+	else
+	{
+		if (IsKeyDown(KEY_D)) player->cVelocity.x = player->maxSpeed;
+		else if (IsKeyDown(KEY_A)) player->cVelocity.x = -player->maxSpeed;
+		else player->cVelocity.x = 0;
+
+		if (IsKeyDown(KEY_S)) player->cVelocity.y = player->maxSpeed;
+		else if (IsKeyDown(KEY_W)) player->cVelocity.y = -player->maxSpeed;
+		else player->cVelocity.y = 0;
+	}
 
 	// Shoot
-	if (IsKeyDown(KEY_SPACE) || IsGestureDetected(GESTURE_TAP))
+	if (IsKeyDown(KEY_SPACE) || IsGestureDetected(GESTURE_TAP) || IsGestureDetected(GESTURE_HOLD))
 	{
 		player->shoot = (player->shootCounter == 0) ? true : false;
 		if (player->shoot) player->shootCounter = 1;

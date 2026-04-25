@@ -99,11 +99,7 @@ void InitGameplayScreen(void)
     enemyCounter = 0;
     enemyCooldown = 100;
 
-    if (onMobileIpad)
-    {
-        SetGesturesEnabled(GESTURE_TAP | GESTURE_HOLD | GESTURE_DRAG);
-        joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
-    }
+    if (onMobileIpad) joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
 }
 
 // Gameplay Screen Update logic
@@ -111,21 +107,13 @@ void UpdateGameplayScreen(void)
 {
     delta = GetFrameTime();
 
-    if (onMobileIpad)
-    {
-        updateJoyStick(&joyStick, delta);
-
-        Vector2 joyStickPos = getJoyStickPos(joyStick);
-
-        player.cVelocity.x = player.maxSpeed / joyStick.baseRadius * joyStickPos.x;
-        player.cVelocity.y = player.maxSpeed / joyStick.baseRadius * joyStickPos.y;
-    }
+    if (onMobileIpad) updateJoyStick(&joyStick, delta);
 
     /*
     BUG: When the player starts shooting while being around lots of
     enemies it sinks or floats.
     */
-    updatePlayer(&player, delta);
+    updatePlayer(&player, joyStick, delta);
 
     // Shoot projectile
     if (player.shoot && prjArrIndex < prjArrSize)

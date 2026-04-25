@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include "health_bar.h"
+#include "joystick.h"
 
 typedef struct
 {
@@ -16,7 +17,7 @@ typedef struct
 } Player;
 
 Player initPlayer(Rectangle rec, float maxSpeed, int healthNum);
-void updatePlayer(Player *player, float delta);
+void updatePlayer(Player *player, JoyStick joyStick, float delta);
 void drawPlayer(Player player);
 void unloadPlayer(Player *player);
 
