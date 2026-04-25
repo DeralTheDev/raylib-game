@@ -262,12 +262,7 @@ void DrawGameplayScreen(void)
 
         drawJoyStick(joyStick);
 
-        DrawTextEx(font, TextFormat("%d", GetTouchPointCount()), (Vector2){10, 300}, fontSize, 4, MAROON);
-
-        for (int i = 0; i < GetTouchPointCount(); i++)
-        {
-            DrawCircle(GetTouchPosition(i).x, GetTouchPosition(i).y, 25, BROWN);
-        }
+        DrawTextEx(font, TextFormat("%d", joyStick.touchId), (Vector2){10, 300}, fontSize, 4, MAROON);
     }
 }
 
