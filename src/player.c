@@ -47,13 +47,12 @@ void updatePlayer(Player *player, JoyStick joyStick, float delta)
 		if (IsKeyDown(KEY_S)) player->cVelocity.y = player->maxSpeed;
 		else if (IsKeyDown(KEY_W)) player->cVelocity.y = -player->maxSpeed;
 		else player->cVelocity.y = 0;
-	}
 
-	// Shoot
-	if (IsKeyDown(KEY_SPACE) || IsGestureDetected(GESTURE_TAP) || IsGestureDetected(GESTURE_HOLD))
-	{
-		player->shoot = (player->shootCounter == 0) ? true : false;
-		if (player->shoot) player->shootCounter = 1;
+		if (IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+		{
+			player->shoot = (player->shootCounter == 0) ? true : false;
+			if (player->shoot) player->shootCounter = 1;
+		}
 	}
 
 	if (player->shootCounter > 0)

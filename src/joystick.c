@@ -8,25 +8,7 @@ JoyStick initJoyStick(Vector2 baseV, float radius)
 }
 
 void updateJoyStick(JoyStick *joyStick, float delta)
-{
-	int touchCount = GetTouchPointCount();
-	for (int i = 0; i < touchCount; i++)
-	{
-		Vector2 touchPos = GetTouchPosition(i);
-		int touchId = GetTouchPointId(i);
-
-		if (hypot(joyStick->basePos.x - touchPos.x, joyStick->basePos.y - touchPos.y) && !joyStick->drag)
-		{
-			joyStick->touchId = touchId;
-		}
-
-		if (joyStick->touchId == touchId) joyStick->drag = true;
-		else joyStick->drag = false;
-
-		if (joyStick->drag) joyStick->cPos = touchPos;
-		else joyStick->cPos = joyStick->basePos;
-	}
-	
+{	
 	if (hypot(joyStick->cPos.x - joyStick->basePos.x, joyStick->cPos.y - joyStick->basePos.y) >= joyStick->baseRadius)
 	{
 		float ratio = joyStick->baseRadius / hypot(joyStick->cPos.x - joyStick->basePos.x, joyStick->cPos.y - joyStick->basePos.y);

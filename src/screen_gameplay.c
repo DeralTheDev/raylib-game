@@ -24,6 +24,7 @@
 **********************************************************************************************/
 
 #include <stdio.h>
+#include <math.h>
 
 #include "raylib.h"
 #include "screens.h"
@@ -107,7 +108,34 @@ void UpdateGameplayScreen(void)
 {
     delta = GetFrameTime();
 
-    if (onMobileIpad) updateJoyStick(&joyStick, delta);
+    if (onMobileIpad)
+    {
+        int touchCount = GetTouchPointCount();
+        for (int i = 0; i < touchCount; i++)
+        {
+            Vector2 touchPos = GetTouchPosition(i);
+            int touchId = GetTouchPointId(i);
+
+            // joyStick
+            if (hypot(joyStick.basePos.x - touchPos.x, joyStick.basePos.y - touchPos.y) <= joyStick.baseRadius && !joyStick.drag)
+                joyStick.touchId = touchId;
+
+            if (joyStick.touchId == touchId) joyStick.drag = true;
+            else joyStick.drag = false;
+
+            if (joyStick.drag) joyStick.cPos = touchPos;
+            else joyStick.cPos = joyStick.basePos;
+
+            // player shoot
+            if (joyStick.touchId != touchId)
+            {
+                player.shoot = (player.shootCounter == 0) ? true : false;
+                if (player.shoot) player.shootCounter = 1;
+            }
+        }
+
+        updateJoyStick(&joyStick, delta);
+    }
 
     /*
     BUG: When the player starts shooting while being around lots of

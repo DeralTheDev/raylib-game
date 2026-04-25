@@ -76,7 +76,7 @@ int main(void)
 
     //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
     fxCoin = LoadSound("resources/coin.wav");
-    onMobileIpad = true;
+    onMobileIpad = false;
 
     SetMusicVolume(music, 1.0f);
     PlayMusicStream(music);
