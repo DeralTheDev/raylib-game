@@ -124,29 +124,25 @@ void UpdateGameplayScreen(void)
 
             // joyStick
             if (hypot(joyStick.basePos.x - touchPos.x, joyStick.basePos.y - touchPos.y) <= joyStick.baseRadius && !joyStick.drag)
+            {
                 joyStick.touchId = touchId;
+            }
+            else
+            {
+                player.shoot = (player.shootCounter == 0) ? true : false;
+                player.shootCounter = (player.shoot) ? 1 : player.shootCounter;
+            }
 
             if (joyStick.touchId == touchId) joyStick.drag = true;
             else joyStick.drag = false;
 
             if (joyStick.drag) joyStick.cPos = touchPos;
             else joyStick.cPos = joyStick.basePos;
-
-            // player shoot
-            if (joyStick.touchId != touchId)
-            {
-                player.shoot = (player.shootCounter == 0) ? true : false;
-                if (player.shoot) player.shootCounter = 1;
-            }
         }
 
         updateJoyStick(&joyStick, delta);
     }
 
-    /*
-    BUG: When the player starts shooting while being around lots of
-    enemies it sinks or floats.
-    */
     updatePlayer(&player, joyStick, delta);
 
     // Shoot projectile
@@ -264,7 +260,12 @@ void DrawGameplayScreen(void)
 
         drawJoyStick(joyStick);
 
-        DrawTextEx(font, TextFormat("%d", GetTouchPointCount()), (Vector2){10, 400}, fontSize, 4, MAROON);
+        DrawTextEx(font, TextFormat("%d", GetTouchPointCount()), (Vector2){10, 300}, fontSize, 4, MAROON);
+
+        for (int i = 0; i < GetTouchPointCount(); i++)
+        {
+            DrawCircle(GetTouchPosition(i).x, GetTouchPosition(i).y, 25, BROWN);
+        }
     }
 }
 

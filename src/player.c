@@ -51,14 +51,14 @@ void updatePlayer(Player *player, JoyStick joyStick, float delta)
 		if (IsKeyDown(KEY_SPACE) || IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
 			player->shoot = (player->shootCounter == 0) ? true : false;
-			if (player->shoot) player->shootCounter = 1;
+			player->shootCounter = (player->shoot) ? 1 : player->shootCounter;
 		}
 	}
 
 	if (player->shootCounter > 0)
 	{
 		player->shootCounter++;
-		if (player->shootCounter >= shootCooldown) player->shootCounter = 0;
+		player->shootCounter = (player->shootCounter >= shootCooldown) ? 0 : player->shootCounter;
 	}
 
 	// Window border limit
