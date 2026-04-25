@@ -59,7 +59,7 @@ if ((value > 1) && (value < 50) && valueActive)
 ```c
 void SomeFunction()
 {
-   // TODO: Do something here!
+    // TODO: Do something here!
 }
 ```
 

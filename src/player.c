@@ -8,7 +8,7 @@ static float lerpValue = 0;
 
 static float shootCooldown = 0;
 
-Player initPlayer(Rectangle rec, Vector2 pos, float maxSpeed, int healthNum)
+Player initPlayer(Rectangle rec, float maxSpeed, int healthNum)
 {
 	screenWidth = GetScreenWidth();
 	screenHeight = GetScreenHeight();
@@ -17,7 +17,7 @@ Player initPlayer(Rectangle rec, Vector2 pos, float maxSpeed, int healthNum)
 
 	shootCooldown = 10;
 
-	return (Player){rec, pos, maxSpeed, (Vector2){0, 0}, false, 0, initHealthBar(healthNum, DARKGREEN)};
+	return (Player){rec, (Vector2){0, 0}, maxSpeed, (Vector2){0, 0}, false, 0, initHealthBar(healthNum, DARKGREEN)};
 }
 
 void updatePlayer(Player *player, float delta)
@@ -70,6 +70,8 @@ void drawPlayer(Player player)
 	DrawRectangleRec(player.rec, DARKBLUE);
 	// Draw healthBar
 	drawHealthBar(player.healthBar);
+
+	DrawText(TextFormat("x: %d, y: %d, %d", (int)player.rec.x, (int)player.rec.y, player.shootCounter), 10, screenHeight * 0.9f, 20, DARKGREEN);
 }
 
 void unloadPlayer(Player *player)

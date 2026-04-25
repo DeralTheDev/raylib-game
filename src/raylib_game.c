@@ -66,7 +66,7 @@ int main(void)
     //---------------------------------------------------------
     ChangeDirectory(GetApplicationDirectory());
     SetRandomSeed(time(NULL));
-    InitWindow(screenWidth, screenHeight, "raylib game template");
+    InitWindow(screenWidth, screenHeight, "game");
 
     InitAudioDevice();      // Initialize audio device
 

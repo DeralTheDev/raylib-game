@@ -15,7 +15,7 @@ typedef struct
 	HealthBar healthBar;
 } Player;
 
-Player initPlayer(Rectangle rec, Vector2 pos, float maxSpeed, int healthNum);
+Player initPlayer(Rectangle rec, float maxSpeed, int healthNum);
 void updatePlayer(Player *player, float delta);
 void drawPlayer(Player player);
 void unloadPlayer(Player *player);

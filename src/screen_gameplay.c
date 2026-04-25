@@ -44,13 +44,13 @@ static int finishScreen = 0;
 
 static Player player = { 0 };
 
-// Only 50 projectiles on-screen
-static Projectile prjArr[50] = { 0 };
+// Only 100 projectiles from player and enemy(s) on-screen
+static Projectile prjArr[100] = { 0 };
 static int prjArrSize = 0;
 static int prjArrIndex = 0;
 
-// Only 10 enemies on-screen
-static Enemy enemyArr[10] = { 0 };
+// Only 5 enemies on-screen
+static Enemy enemyArr[5] = { 0 };
 static int enemyArrSize = 0;
 static int enemyArrIndex = 0;
 static int enemyCounter = 0;
@@ -62,17 +62,10 @@ static JoyStick joyStick = { 0 };
 // Gameplay Screen Functions Definition
 //----------------------------------------------------------------------------------
 
-static void prjArrDel(Projectile prjArr[50], int index, int *currSize)
+static void prjArrDel(Projectile prjArr[100], int index, int *currSize)
 {
     for (int i = index; i < (*currSize) - 1; i++)
         prjArr[i] = prjArr[i + 1];
-    (*currSize)--;
-}
-
-static void enemyArrDel(Enemy enemyArr[50], int index, int *currSize)
-{
-    for (int i = index; i < (*currSize) - 1; i++)
-        enemyArr[i] = enemyArr[i + 1];
     (*currSize)--;
 }
 
@@ -87,7 +80,7 @@ void InitGameplayScreen(void)
     framesCounter = 0;
     finishScreen = 0;
 
-    player = initPlayer((Rectangle){150, 0, 75, 50}, (Vector2){0, 0}, 300, 10);
+    player = initPlayer((Rectangle){150, 0, 75, 50}, 300, 10);
     player.rec.y = (screenHeight - player.rec.height) / 2;
 
     prjArrSize = sizeof(prjArr) / sizeof(Projectile);
@@ -108,8 +101,8 @@ void InitGameplayScreen(void)
 
     if (onMobileIpad)
     {
-        SetGesturesEnabled(GESTURE_HOLD);
-        joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.8f}, screenWidth * 0.1f);
+        SetGesturesEnabled(GESTURE_TAP | GESTURE_HOLD | GESTURE_DRAG);
+        joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
     }
 }
 
@@ -118,17 +111,27 @@ void UpdateGameplayScreen(void)
 {
     delta = GetFrameTime();
 
-    if (onMobileIpad) updateJoyStick(&joyStick, delta);
+    if (onMobileIpad)
+    {
+        updateJoyStick(&joyStick, delta);
 
+        Vector2 joyStickPos = getJoyStickPos(joyStick);
+
+        player.cVelocity.x = player.maxSpeed / joyStick.baseRadius * joyStickPos.x;
+        player.cVelocity.y = player.maxSpeed / joyStick.baseRadius * joyStickPos.y;
+    }
+
+    /*
+    BUG: When the player starts shooting while being around lots of
+    enemies it sinks or floats.
+    */
     updatePlayer(&player, delta);
 
     // Shoot projectile
-    if (player.shoot && prjArrIndex < sizeof(prjArr) / sizeof(Projectile))
+    if (player.shoot && prjArrIndex < prjArrSize)
     {
         prjArr[prjArrIndex] = initProjectile(
-            (Rectangle){
-                player.rec.x + player.rec.width, 0, 15, 8},
-            (Vector2){0, 0}, 1000, 1
+            (Rectangle){player.rec.x + player.rec.width, 0, 15, 8}, 1000, 1
         );
         prjArr[prjArrIndex].rec.y = player.rec.y + (player.rec.height - prjArr[prjArrIndex].rec.height) / 2;
         prjArrIndex++;
@@ -141,31 +144,37 @@ void UpdateGameplayScreen(void)
 
     if (enemyCounter >= enemyCooldown)
     {
-        enemyArr[enemyArrIndex] = initEnemy(
-            (Rectangle){GetRandomValue(screenWidth + 50, screenWidth + 150), GetRandomValue(0, screenHeight), 75, 50},
-            (Vector2){0, 0}, GetRandomValue(100, 300), GetRandomValue(3, 10)
+        int randIndex = GetRandomValue(0, enemyArrSize - 1);
+        while (enemyArr[randIndex].maxSpeed != 0) randIndex = GetRandomValue(0, enemyArrSize - 1);
+        enemyArr[randIndex] = initEnemy(
+            (Rectangle){GetRandomValue(screenWidth + 50, screenWidth + 150), randIndex * (screenHeight / enemyArrSize) + 25, 75, 50},
+            (Vector2){-GetRandomValue(50, 200), 0}, GetRandomValue(100, 300), GetRandomValue(3, 10)
         );
         enemyArrIndex++;
         enemyCounter = 0;
     }
 
-    for (int i = 0; i < enemyArrIndex; i++)
+    for (int i = 0; i < enemyArrSize; i++)
     {
-        updateEnemy(&enemyArr[i], player.rec, delta);
-        if (enemyArr[i].shoot && prjArrIndex < prjArrSize)
+        if (enemyArr[i].maxSpeed != 0)
         {
-            prjArr[prjArrIndex] = initProjectile(
-                (Rectangle){
-                    enemyArr[i].rec.x, 0, 15, 8},
-                (Vector2){0, 0}, -500, 2
-            );
-            prjArr[prjArrIndex].rec.y = enemyArr[i].rec.y + (enemyArr[i].rec.height - prjArr[prjArrIndex].rec.height) / 2;
-            prjArrIndex++;
-            enemyArr[i].shoot = false;
-        }
+            updateEnemy(&enemyArr[i], delta);
+            if (enemyArr[i].shoot && prjArrIndex < prjArrSize)
+            {
+                prjArr[prjArrIndex] = initProjectile(
+                    (Rectangle){enemyArr[i].rec.x, 0, 15, 8}, -500, 2
+                );
+                prjArr[prjArrIndex].rec.y = enemyArr[i].rec.y + (enemyArr[i].rec.height - prjArr[prjArrIndex].rec.height) / 2;
+                prjArrIndex++;
+                enemyArr[i].shoot = false;
+            }
 
-        if (enemyArr[i].rec.x + enemyArr[i].rec.width <= 0)
-            enemyArrDel(enemyArr, i, &enemyArrIndex);
+            if (enemyArr[i].rec.x + enemyArr[i].rec.width <= 0)
+            {
+                enemyArr[i] = (Enemy){ 0 };
+                enemyArrIndex--;
+            }
+        }
     }
 
     // Projectiles
@@ -174,7 +183,7 @@ void UpdateGameplayScreen(void)
         updateProjectile(&prjArr[i], delta);
 
         // If projectile out of window, DELETE IT
-        if (prjArr[i].rec.x >= screenWidth || prjArr[i].rec.x - prjArr[i].rec.width <= 0)
+        if (prjArr[i].rec.x >= screenWidth || prjArr[i].rec.x + prjArr[i].rec.width <= 0)
         {
             prjArrDel(prjArr, i, &prjArrIndex);
         }
@@ -186,14 +195,17 @@ void UpdateGameplayScreen(void)
             player.healthBar.healthNum--;
         }
 
-        for (int j = 0; j < enemyArrIndex; j++)
+        for (int j = 0; j < enemyArrSize; j++)
         {
             if (projectileCollided(prjArr[i], enemyArr[j].rec) && prjArr[i].id == 1)
             {
                 prjArrDel(prjArr, i, &prjArrIndex);
                 enemyArr[j].healthBar.healthNum--;
                 if (enemyArr[j].healthBar.healthNum <= 0)
-                    enemyArrDel(enemyArr, j, &enemyArrIndex);
+                {
+                    enemyArr[j] = (Enemy){ 0 };
+                    enemyArrIndex--;
+                }
             }
         }
     }
@@ -207,6 +219,7 @@ void DrawGameplayScreen(void)
     // TODO: Draw GAMEPLAY screen here!
     Vector2 pos = {10, 10};
     DrawTextEx(font, "GAMEPLAY SCREEN", pos, fontSize, 4, MAROON);
+    DrawTextEx(font, TextFormat("projectiles: %d", prjArrIndex), (Vector2){10, 200}, fontSize, 4, MAROON);
     // Draw projectile(s)
     for (int i = 0; i < prjArrIndex; i++)
     {
@@ -217,9 +230,9 @@ void DrawGameplayScreen(void)
     drawPlayer(player);
 
     // Draw enemy(s)
-    for (int i = 0; i < enemyArrIndex; i++)
+    for (int i = 0; i < enemyArrSize; i++)
     {
-        drawEnemy(enemyArr[i]);
+        if (enemyArr[i].maxSpeed != 0) drawEnemy(enemyArr[i]);
     }
 
     if (onMobileIpad)
@@ -247,6 +260,8 @@ void UnloadGameplayScreen(void)
         unloadEnemy(&enemyArr[i]);
     }
     enemyArrIndex = 0;
+
+    if (onMobileIpad) unloadJoyStick(&joyStick);
 }
 
 // Gameplay Screen should finish?

@@ -11,7 +11,7 @@ typedef struct
 	int id; // 0 = unknown; 1 = player; 2 = enemy;
 } Projectile;
 
-Projectile initProjectile(Rectangle rec, Vector2 v, float speed, int id);
+Projectile initProjectile(Rectangle rec, float speed, int id);
 void updateProjectile(Projectile *prj, float delta);
 void drawProjectile(Projectile prj);
 bool projectileCollided(Projectile prj, Rectangle rec);

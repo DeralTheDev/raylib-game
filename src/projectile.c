@@ -1,8 +1,8 @@
 #include "projectile.h"
 
-Projectile initProjectile(Rectangle rec, Vector2 v, float speed, int id)
+Projectile initProjectile(Rectangle rec, float speed, int id)
 {
-	return (Projectile){rec, v, speed, id};
+	return (Projectile){rec, (Vector2){0, 0}, speed, id};
 }
 
 void updateProjectile(Projectile *prj, float delta)

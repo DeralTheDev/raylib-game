@@ -1,11 +1,10 @@
 #include "enemy.h"
-#include "raymath.h"
 
 static float screenWidth = 0;
 static float screenHeight = 0;
 
 static float lerpValue = 0;
-static float minSpeed = 30;
+static float minSpeed = 10;
 
 static int shootCooldown = 0;
 
@@ -14,39 +13,25 @@ Enemy initEnemy(Rectangle rec, Vector2 v, float speed, int healthNum)
 	screenWidth = GetScreenWidth();
 	screenHeight = GetScreenHeight();
 
-	lerpValue = 0.025f;
-
 	shootCooldown = 100;
 
-	return (Enemy){rec, v, speed, false, false, false, (Vector2){0, 0}, 0, initHealthBar(healthNum, DARKGREEN)};
+	return (Enemy){rec, v, speed, false, false, false, 0, initHealthBar(healthNum, DARKGREEN)};
 }
 
-void updateEnemy(Enemy *enemy, Rectangle targetRec, float delta)
+void updateEnemy(Enemy *enemy, float delta)
 {
-	enemy->velocity.x = Lerp(enemy->velocity.x, enemy->cVelocity.x, lerpValue);
-	enemy->velocity.y = Lerp(enemy->velocity.y, enemy->cVelocity.y, lerpValue);
-
 	enemy->rec.x += enemy->velocity.x * delta;
 	enemy->rec.y += enemy->velocity.y * delta;
 
-	enemy->cVelocity.x = (fabs(enemy->rec.x - targetRec.x + targetRec.width) > 100.0f) ? -enemy->maxSpeed : -minSpeed;
-
-	// Track the target, if successfull then shoot
-	if (fabs(enemy->rec.y - targetRec.y) <= 3.0f)
-	{
-		enemy->shoot = (enemy->shootCounter == 0) ? true : false;
-		if (enemy->shoot) enemy->shootCounter = 1;
-	}
-	else
-	{
-		enemy->cVelocity.y = (enemy->rec.y - targetRec.y < 0) ? enemy->maxSpeed : -enemy->maxSpeed;
-	}
-
 	// Shoot cooldown
-	if (enemy->shootCounter > 0)
+	if (!enemy->shoot)
 	{
 		enemy->shootCounter++;
-		if (enemy->shootCounter >= shootCooldown) enemy->shootCounter = 0;
+		if (enemy->shootCounter >= shootCooldown)
+		{
+			enemy->shoot = true;
+			enemy->shootCounter = 0;
+		}
 	}
 
 	// HealthBar

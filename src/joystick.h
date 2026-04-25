@@ -17,4 +17,6 @@ void updateJoyStick(JoyStick *joyStick, float delta);
 void drawJoyStick(JoyStick joyStick);
 void unloadJoyStick(JoyStick *joyStick);
 
+Vector2 getJoyStickPos(JoyStick joyStick);
+
 #endif // JOYSTICK_H
