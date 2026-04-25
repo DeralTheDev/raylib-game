@@ -115,6 +115,7 @@ void UpdateGameplayScreen(void)
 
     if (onMobileIpad)
     {
+        // Handle multitouch input
         int touchCount = GetTouchPointCount();
         if (touchCount > maxTouchPoint) touchCount = maxTouchPoint;
         for (int i = 0; i < touchCount; i++)
@@ -127,14 +128,15 @@ void UpdateGameplayScreen(void)
             {
                 joyStick.touchId = touchId;
             }
+
+            if (joyStick.touchId == touchId) joyStick.drag = true;
             else
             {
+                joyStick.drag = false;
+                // player shoot
                 player.shoot = (player.shootCounter == 0) ? true : false;
                 player.shootCounter = (player.shoot) ? 1 : player.shootCounter;
             }
-
-            if (joyStick.touchId == touchId) joyStick.drag = true;
-            else joyStick.drag = false;
 
             if (joyStick.drag) joyStick.cPos = touchPos;
             else joyStick.cPos = joyStick.basePos;

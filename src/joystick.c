@@ -4,7 +4,7 @@
 
 JoyStick initJoyStick(Vector2 baseV, float radius)
 {
-	return (JoyStick){baseV, radius, baseV, radius * 0.5f, (Vector2){0, 0}, false, 0};
+	return (JoyStick){baseV, radius, baseV, radius * 0.5f, (Vector2){0, 0}, false, -1};
 }
 
 void updateJoyStick(JoyStick *joyStick, float delta)
