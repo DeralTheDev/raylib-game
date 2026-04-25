@@ -11,6 +11,7 @@ typedef struct
 	float cRadius;
 	Vector2 cDir;
 	bool drag;
+	int touchId;
 } JoyStick;
 
 JoyStick initJoyStick(Vector2 baseV, float radius);
