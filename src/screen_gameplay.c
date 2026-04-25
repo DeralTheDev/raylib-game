@@ -58,6 +58,7 @@ static int enemyCounter = 0;
 static int enemyCooldown = 0;
 
 static JoyStick joyStick = { 0 };
+static int maxTouchPoint = 0;
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
@@ -100,7 +101,11 @@ void InitGameplayScreen(void)
     enemyCounter = 0;
     enemyCooldown = 100;
 
-    if (onMobileIpad) joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
+    if (onMobileIpad)
+    {
+        joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
+        maxTouchPoint = 2;
+    }
 }
 
 // Gameplay Screen Update logic
@@ -111,6 +116,7 @@ void UpdateGameplayScreen(void)
     if (onMobileIpad)
     {
         int touchCount = GetTouchPointCount();
+        if (touchCount > maxTouchPoint) touchCount = maxTouchPoint;
         for (int i = 0; i < touchCount; i++)
         {
             Vector2 touchPos = GetTouchPosition(i);
@@ -257,6 +263,8 @@ void DrawGameplayScreen(void)
         DrawTextEx(font, "ON MOBILE/IPAD", pos, fontSize, 4, DARKGREEN);
 
         drawJoyStick(joyStick);
+
+        DrawTextEx(font, TextFormat("%d", GetTouchPointCount()), (Vector2){10, 400}, fontSize, 4, MAROON);
     }
 }
 

@@ -239,7 +239,6 @@ static void UpdateDrawFrame(void)
     {
         onMobileIpad = true;
         SetGesturesEnabled(GESTURE_TAP | GESTURE_HOLD | GESTURE_DRAG);
-        printf("yes\n");
     }
 
     if (!onTransition)
