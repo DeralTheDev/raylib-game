@@ -10,11 +10,11 @@ void updateJoyStick(JoyStick *joyStick, float delta)
 {
 	Vector2 touchPos = GetTouchPosition(GetTouchPointCount());
 
-	if (hypot(touchPos.x - joyStick->cPos.x, touchPos.y - joyStick->cPos.y) <= joyStick->cRadius)
+	if (hypot(touchPos.x - joyStick->basePos.x, touchPos.y - joyStick->basePos.y) <= joyStick->baseRadius)
 	{
 		if (IsGestureDetected(GESTURE_DRAG)) joyStick->drag = true;
-		else joyStick->drag = false;
 	}
+	if (!IsGestureDetected(GESTURE_DRAG)) joyStick->drag = false;
 
 	if (joyStick->drag) joyStick->cPos = touchPos;
 	else joyStick->cPos = joyStick->basePos;
