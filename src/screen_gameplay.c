@@ -123,23 +123,7 @@ void UpdateGameplayScreen(void)
             Vector2 touchPos = GetTouchPosition(i);
             int touchId = GetTouchPointId(i);
 
-            // joyStick
-            if (hypot(joyStick.basePos.x - touchPos.x, joyStick.basePos.y - touchPos.y) <= joyStick.baseRadius && !joyStick.drag)
-            {
-                joyStick.touchId = touchId;
-            }
-
-            if (joyStick.touchId == touchId) joyStick.drag = true;
-            else
-            {
-                joyStick.drag = false;
-                // player shoot
-                player.shoot = (player.shootCounter == 0) ? true : false;
-                player.shootCounter = (player.shoot) ? 1 : player.shootCounter;
-            }
-
-            if (joyStick.drag) joyStick.cPos = touchPos;
-            else joyStick.cPos = joyStick.basePos;
+            // TODO: JoyStick touch
         }
 
         updateJoyStick(&joyStick, delta);

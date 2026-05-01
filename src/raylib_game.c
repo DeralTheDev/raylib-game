@@ -33,6 +33,8 @@ Music music = { 0 };
 Sound fxCoin = { 0 };
 bool onMobileIpad = false;
 
+Texture2D smileSprite = { 0 };
+
 //----------------------------------------------------------------------------------
 // Global Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
@@ -76,6 +78,7 @@ int main(void)
 
     //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
     fxCoin = LoadSound("resources/coin.wav");
+    smileSprite = LoadTexture("resources/smile.png");
     onMobileIpad = false;
 
     SetMusicVolume(music, 1.0f);
@@ -113,6 +116,7 @@ int main(void)
 
     // Unload global data loaded
     UnloadFont(font);
+    UnloadTexture(smileSprite);
     UnloadMusicStream(music);
     UnloadSound(fxCoin);
 
@@ -308,6 +312,14 @@ static void UpdateDrawFrame(void)
         if (onTransition) DrawTransition();
 
         //DrawFPS(10, 10);
+
+        DrawTexturePro(
+            smileSprite,
+            (Rectangle){0, 0, smileSprite.width, smileSprite.height},
+            (Rectangle){200, 100, smileSprite.width * 5, smileSprite.height * 5},
+            (Vector2){smileSprite.width * 5 / 2, smileSprite.height * 5 / 2},
+            0, WHITE
+        );
 
     EndDrawing();
     //----------------------------------------------------------------------------------
