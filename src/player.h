@@ -13,12 +13,15 @@ typedef struct
 	Vector2 cVelocity;
 	bool shoot;
 	int shootCounter;
+	bool isHit;
 	HealthBar healthBar;
+	bool drawRec;
+	Color color;
 } Player;
 
 Player initPlayer(Rectangle rec, float maxSpeed, int healthNum);
 void updatePlayer(Player *player, JoyStick joyStick, float delta);
-void drawPlayer(Player player);
+void drawPlayer(Player player, Texture2D sprite, int scale);
 void unloadPlayer(Player *player);
 
 #endif // PLAYER_H

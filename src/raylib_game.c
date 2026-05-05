@@ -27,13 +27,24 @@
 // NOTE: Those variables are shared between modules through screens.h
 //----------------------------------------------------------------------------------
 GameScreen currentScreen = LOGO;
+
+// Font & text
 Font font = { 0 };
 int fontSize = 0;
+int dSpacing = 0;
+
+// Sound & music
 Music music = { 0 };
 Sound fxCoin = { 0 };
-bool onMobileIpad = false;
+Sound fxShoot = { 0 };
+Sound fxHit = { 0 };
 
-Texture2D smileSprite = { 0 };
+// Texture & sprite
+Texture2D shipSprite = { 0 };
+int scale = 0;
+
+// Other
+bool onMobileIpad = false;
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition (local to this module)
@@ -47,6 +58,9 @@ static bool onTransition = false;
 static bool transFadeOut = false;
 static int transFromScreen = -1;
 static GameScreen transToScreen = UNKNOWN;
+
+// Only 50 starts on-screen
+static Vector2 starArr[75] = { 0 };
 
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
@@ -75,18 +89,33 @@ int main(void)
     // Load global data (assets that must be available in all screens, i.e. font)
     font = LoadFont("resources/mecha.png");
     fontSize = font.baseSize * 3.0f;
+    dSpacing = 4;
 
     //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
     fxCoin = LoadSound("resources/coin.wav");
-    smileSprite = LoadTexture("resources/smile.png");
+    fxShoot = LoadSound("resources/laser_shoot.wav");
+    fxHit = LoadSound("resources/hit.wav");
+
+    // Texture & sprite
+    shipSprite = LoadTexture("resources/ship.png");
+    scale = 10;
+
+    // Other
     onMobileIpad = false;
 
     SetMusicVolume(music, 1.0f);
     PlayMusicStream(music);
 
+    SetSoundVolume(fxShoot, 0.5f);
+
     // Setup and init first screen
     currentScreen = TITLE;
     InitLogoScreen();
+
+    for (int i = 0; i < sizeof(starArr) / sizeof(starArr[0]); i++)
+    {
+        starArr[i] = (Vector2){GetRandomValue(10, GetScreenWidth() - 10), GetRandomValue(10, GetScreenHeight() - 10)};
+    }
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -116,9 +145,11 @@ int main(void)
 
     // Unload global data loaded
     UnloadFont(font);
-    UnloadTexture(smileSprite);
     UnloadMusicStream(music);
     UnloadSound(fxCoin);
+    UnloadSound(fxShoot);
+    UnloadSound(fxHit);
+    UnloadTexture(shipSprite);
 
     CloseAudioDevice();     // Close audio context
 
@@ -284,6 +315,7 @@ static void UpdateDrawFrame(void)
                 UpdateEndingScreen();
 
                 if (FinishEndingScreen() == 1) TransitionToScreen(TITLE);
+                else if (FinishEndingScreen() == 2) TransitionToScreen(GAMEPLAY);
 
             } break;
             default: break;
@@ -296,7 +328,20 @@ static void UpdateDrawFrame(void)
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
+
+        // Stars movement and drawing
+        for (int i = 0; i < sizeof(starArr) / sizeof(starArr[0]); i++)
+        {
+            DrawRectangle(starArr[i].x, starArr[i].y, 3, 3, WHITE);
+            starArr[i].x -= 100.0f * GetFrameTime();
+
+            if (starArr[i].x <= -3)
+            {
+                starArr[i].x = GetRandomValue(GetScreenWidth(), GetScreenWidth() + 50);
+                starArr[i].y = GetRandomValue(10, GetScreenHeight() - 10);
+            }
+        }
 
         switch (currentScreen)
         {
@@ -312,14 +357,6 @@ static void UpdateDrawFrame(void)
         if (onTransition) DrawTransition();
 
         //DrawFPS(10, 10);
-
-        DrawTexturePro(
-            smileSprite,
-            (Rectangle){0, 0, smileSprite.width, smileSprite.height},
-            (Rectangle){200, 100, smileSprite.width * 5, smileSprite.height * 5},
-            (Vector2){smileSprite.width * 5 / 2, smileSprite.height * 5 / 2},
-            0, WHITE
-        );
 
     EndDrawing();
     //----------------------------------------------------------------------------------

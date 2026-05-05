@@ -35,10 +35,23 @@ typedef enum GameScreen { UNKNOWN = -1, LOGO = 0, TITLE, OPTIONS, GAMEPLAY, ENDI
 // Global Variables Declaration (shared by several modules)
 //----------------------------------------------------------------------------------
 extern GameScreen currentScreen;
+
+// Font & text
 extern Font font;
 extern int fontSize;
+extern int dSpacing;
+
+// Sound & music
 extern Music music;
 extern Sound fxCoin;
+extern Sound fxShoot;
+extern Sound fxHit;
+
+// Texture & sprite
+extern Texture2D shipSprite;
+extern int scale;
+
+// Other
 extern bool onMobileIpad;
 
 #ifdef __cplusplus

@@ -49,11 +49,12 @@ void UpdateEndingScreen(void)
 {
     // TODO: Update ENDING screen variables here!
 
-    // Press enter or tap to return to TITLE screen
-    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    framesCounter++;
+
+    if (framesCounter >= 50)
     {
-        finishScreen = 1;
-        PlaySound(fxCoin);
+        if (GetKeyPressed() != KEY_NULL || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) finishScreen = 2;
+        if (framesCounter >= 100) framesCounter = 0;
     }
 }
 
@@ -61,11 +62,22 @@ void UpdateEndingScreen(void)
 void DrawEndingScreen(void)
 {
     // TODO: Draw ENDING screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLUE);
+    const char *str = "Game Over...";
+    Vector2 pos = {
+        (GetScreenWidth() - MeasureTextEx(font, str, fontSize, dSpacing).x) / 2,
+        (GetScreenHeight() - MeasureTextEx(font, str, fontSize, dSpacing).y) / 2
+    };
+    DrawTextEx(font, str, pos, fontSize, dSpacing, RAYWHITE);
 
-    Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "ENDING SCREEN", pos, font.baseSize*3.0f, 4, DARKBLUE);
-    DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
+    if (framesCounter >= 50)
+    {
+        const char *str1 = "Press anything to restart.";
+        Vector2 pos1 = {
+            (GetScreenWidth() - MeasureTextEx(font, str1, (int)(fontSize * 0.75f), dSpacing).x) / 2,
+            (int)(pos.y * 1.2f) + MeasureTextEx(font, str1, (int)(fontSize * 0.75f), dSpacing).y
+        };
+        DrawTextEx(font, str1, pos1, (int)(fontSize * 0.75f), dSpacing, RAYWHITE);
+    }
 }
 
 // Ending Screen Unload logic

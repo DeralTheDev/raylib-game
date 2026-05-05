@@ -6,7 +6,7 @@ static float defaultHeight = 0;
 HealthBar initHealthBar(int healthNum, Color color)
 {
 	defaultWidth = 100;
-	defaultHeight = 20;
+	defaultHeight = 10;
 
 	return (HealthBar){
 		(Rectangle){0, 0, defaultWidth, defaultHeight},

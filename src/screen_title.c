@@ -49,12 +49,9 @@ void UpdateTitleScreen(void)
 {
     // TODO: Update TITLE screen variables here!
 
-    // Press enter or tap to change to GAMEPLAY screen
-    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    if (GetKeyPressed() != KEY_NULL || IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
-        //finishScreen = 1;   // OPTIONS
-        finishScreen = 2;   // GAMEPLAY
-        PlaySound(fxCoin);
+        finishScreen = 2; // 1 = Options, 2 = Gameplay
     }
 }
 
@@ -62,10 +59,12 @@ void UpdateTitleScreen(void)
 void DrawTitleScreen(void)
 {
     // TODO: Draw TITLE screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), GREEN);
-    Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "TITLE SCREEN", pos, font.baseSize*3.0f, 4, DARKGREEN);
-    DrawText("PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
+    const char *str = "Press anything to start!";
+    Vector2 pos = {
+        (GetScreenWidth() - MeasureTextEx(font, str, fontSize, dSpacing).x) / 2,
+        (GetScreenHeight() - MeasureTextEx(font, str, fontSize, dSpacing).y) / 2
+    };
+    DrawTextEx(font, str, pos, fontSize, dSpacing, RAYWHITE);
 }
 
 // Title Screen Unload logic

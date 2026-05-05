@@ -60,6 +60,8 @@ static int enemyCooldown = 0;
 static JoyStick joyStick = { 0 };
 static int maxTouchPoint = 0;
 
+static int currScore = 0;
+
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
 //----------------------------------------------------------------------------------
@@ -106,6 +108,8 @@ void InitGameplayScreen(void)
         joyStick = initJoyStick((Vector2){screenWidth * 0.15f, screenHeight * 0.75f}, screenWidth * 0.1f);
         maxTouchPoint = 2;
     }
+
+    currScore = 0;
 }
 
 // Gameplay Screen Update logic
@@ -131,6 +135,8 @@ void UpdateGameplayScreen(void)
 
     updatePlayer(&player, joyStick, delta);
 
+    if (IsKeyPressed(KEY_R)) player.drawRec = !player.drawRec;
+
     // Shoot projectile
     if (player.shoot && prjArrIndex < prjArrSize)
     {
@@ -139,6 +145,8 @@ void UpdateGameplayScreen(void)
         );
         prjArr[prjArrIndex].rec.y = player.rec.y + (player.rec.height - prjArr[prjArrIndex].rec.height) / 2;
         prjArrIndex++;
+        PlaySound(fxShoot);
+        SetSoundPitch(fxShoot, GetRandomValue(3, 10) * 0.1f);
         player.shoot = false;
     }
 
@@ -170,6 +178,7 @@ void UpdateGameplayScreen(void)
                 );
                 prjArr[prjArrIndex].rec.y = enemyArr[i].rec.y + (enemyArr[i].rec.height - prjArr[prjArrIndex].rec.height) / 2;
                 prjArrIndex++;
+                PlaySound(fxShoot);
                 enemyArr[i].shoot = false;
             }
 
@@ -177,6 +186,17 @@ void UpdateGameplayScreen(void)
             {
                 enemyArr[i] = (Enemy){ 0 };
                 enemyArrIndex--;
+            }
+
+            enemyArr[i].drawRec = player.drawRec;
+
+            if (CheckCollisionRecs(enemyArr[i].rec, player.rec))
+            {
+                enemyArr[i] = (Enemy){ 0 };
+                enemyArrIndex--;
+
+                player.isHit = true;
+                player.healthBar.healthNum -= 3;
             }
         }
     }
@@ -196,7 +216,9 @@ void UpdateGameplayScreen(void)
         if (projectileCollided(prjArr[i], player.rec) && prjArr[i].id == 2)
         {
             prjArrDel(prjArr, i, &prjArrIndex);
+            player.isHit = true;
             player.healthBar.healthNum--;
+            PlaySound(fxHit);
         }
 
         for (int j = 0; j < enemyArrSize; j++)
@@ -204,64 +226,60 @@ void UpdateGameplayScreen(void)
             if (projectileCollided(prjArr[i], enemyArr[j].rec) && prjArr[i].id == 1)
             {
                 prjArrDel(prjArr, i, &prjArrIndex);
+                enemyArr[j].isHit = true;
                 enemyArr[j].healthBar.healthNum--;
                 if (enemyArr[j].healthBar.healthNum <= 0)
                 {
                     enemyArr[j] = (Enemy){ 0 };
                     enemyArrIndex--;
-                }
+                    currScore++;
+                    PlaySound(fxCoin);
+                } else PlaySound(fxHit);
             }
         }
     }
 
-    //if (player.healthBar.healthNum <= 0) finishScreen = 1;
+    if (player.healthBar.healthNum <= 0) finishScreen = 1;
 }
 
 // Gameplay Screen Draw logic
 void DrawGameplayScreen(void)
 {
     // TODO: Draw GAMEPLAY screen here!
-    Vector2 pos = {10, 10};
-    DrawTextEx(font, "GAMEPLAY SCREEN", pos, fontSize, 4, MAROON);
-    DrawTextEx(font, TextFormat("projectiles: %d", prjArrIndex), (Vector2){10, 200}, fontSize, 4, MAROON);
     // Draw projectile(s)
     for (int i = 0; i < prjArrIndex; i++)
     {
-        DrawRectangleRec(prjArr[i].rec, MAROON);
+        DrawRectangleRec(prjArr[i].rec, GOLD);
     }
 
     // Draw player
-    drawPlayer(player);
+    drawPlayer(player, shipSprite, scale);
 
     // Draw enemy(s)
     for (int i = 0; i < enemyArrSize; i++)
     {
-        if (enemyArr[i].maxSpeed != 0) drawEnemy(enemyArr[i]);
+        if (enemyArr[i].maxSpeed != 0) drawEnemy(enemyArr[i], shipSprite, scale);
     }
+
+    // Draw score text
+    DrawTextEx(font, TextFormat("Score: %d", currScore), (Vector2){15, 15}, fontSize, dSpacing, RAYWHITE);
 
     if (onMobileIpad)
     {
-        Vector2 pos = {10, 50};
-        DrawTextEx(font, "ON MOBILE/IPAD", pos, fontSize, 4, DARKGREEN);
-
         drawJoyStick(joyStick);
-
-        DrawTextEx(font, TextFormat("%d", joyStick.touchId), (Vector2){10, 300}, fontSize, 4, MAROON);
     }
 }
 
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void)
 {
-    unloadPlayer(&player);
-
     for (int i = 0; i < prjArrIndex; i++)
     {
         unloadProjectile(&prjArr[i]);
     }
     prjArrIndex = 0;
 
-    for (int i = 0; i < enemyArrIndex; i++)
+    for (int i = 0; i < enemyArrSize; i++)
     {
         unloadEnemy(&enemyArr[i]);
     }
