@@ -40,12 +40,10 @@ void updateEnemy(Enemy *enemy, float delta)
 		}
 	}
 
-	if ((int)enemy->color.r != defaultColor.r || (int)enemy->color.g != defaultColor.g || (int)enemy->color.b != defaultColor.b)
-	{
-		enemy->color.r = (int)Lerp(enemy->color.r, defaultColor.r, lerpValue * delta);
-		enemy->color.g = (int)Lerp(enemy->color.g, defaultColor.g, lerpValue * delta);
-		enemy->color.b = (int)Lerp(enemy->color.b, defaultColor.b, lerpValue * delta);
-	}
+	// Is shot animation
+	enemy->color.r = (int)Lerp(enemy->color.r, defaultColor.r, lerpValue * delta);
+	enemy->color.g = (int)Lerp(enemy->color.g, defaultColor.g, lerpValue * delta);
+	enemy->color.b = (int)Lerp(enemy->color.b, defaultColor.b, lerpValue * delta);
 
 	if (enemy->isHit)
 	{

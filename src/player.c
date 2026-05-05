@@ -70,12 +70,9 @@ void updatePlayer(Player *player, JoyStick joyStick, float delta)
 	}
 
 	// Is shot animation
-	if (player->color.r != defaultColor.r || player->color.g != defaultColor.g || player->color.b != defaultColor.b)
-	{
-		player->color.r = Lerp(player->color.r, defaultColor.r, lerpValueC * delta);
-		player->color.g = Lerp(player->color.g, defaultColor.g, lerpValueC * delta);
-		player->color.b = Lerp(player->color.b, defaultColor.b, lerpValueC * delta);
-	}
+	player->color.r = Lerp(player->color.r, defaultColor.r, lerpValueC * delta);
+	player->color.g = Lerp(player->color.g, defaultColor.g, lerpValueC * delta);
+	player->color.b = Lerp(player->color.b, defaultColor.b, lerpValueC * delta);
 
 	if (player->isHit)
 	{
